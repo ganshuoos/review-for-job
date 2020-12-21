@@ -155,5 +155,54 @@ a = append(a[:2], a[3:]...)
 a = append(a[:index], a[index+1:]...)
 
 //切片与数组的区别
+//数组 值类型 固定长度 且长度是类型的一部分 
+//切片 引用类型 不定长度 含三个属性（底层数组 长度 容量） 
+```
+
+三、map
+
+```go
+//Go语言中提供的映射关系容器为map，其内部使用散列表（hash）实现。
+//map是一种无序的基于key-value的数据结构，Go语言中的map是引用类型，必须初始化才能使用。
+map[KeyType]ValueType
+make(map[KeyType]ValueType, [cap])
+//其中cap表示map的容量，该参数虽然不是必须的，但是我们应该在初始化map的时候就为其指定一个合适的容量。
+
+//判断某个键是否存在
+// 如果key存在ok为true,v为对应的值；不存在ok为false,v为值类型的零值
+value, ok := map[key]
+
+//map遍历  for range
+//注意： 遍历map时的元素顺序与添加键值对的顺序无关。
+func main() {
+	scoreMap := make(map[string]int)
+	scoreMap["张三"] = 90
+	scoreMap["小明"] = 100
+	scoreMap["娜扎"] = 60
+	for k, v := range scoreMap {
+		fmt.Println(k, v)
+	}
+}
+
+//使用delete()函数删除键值对
+delete(map, key)
+//map:表示要删除键值对的map
+//key:表示要删除的键值对的键
+
+//make 与 new 的区别
+/*
+简要而言：
+new 只分配内存，
+make 只能用于 slice、map 和 channel 的初始化。
+
+new 函数只接受一个参数，这个参数是一个类型，并且返回一个指向该类型内存地址的指针。同时 new 函数会把分配的内存置为零，也就是类型的零值。
+
+make 也是用于内存分配的，它只用于 chan、map 以及 slice 的内存创建，而且它返回的类型就是这三个类型本身，而不是他们的指针类型，因为这三种类型就是引用类型，所以就没有必要返回他们的指针了。
+
+Go语言中的 new 和 make 主要区别如下：
+make 只能用来分配及初始化类型为 slice、map、chan 的数据。new 可以分配任意类型的数据；
+new 分配返回的是指针，即类型 *Type。make 返回引用，即 Type；
+new 分配的空间被清零。make 分配空间后，会进行初始化。
+*/
 ```
 
