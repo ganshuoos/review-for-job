@@ -89,3 +89,48 @@ reduce(k2,list(v2))--> list (v2)
 
 
 
+**四、改进**
+
+> 分区函数
+>
+> 默认情况下，分区函数使用的是哈希进行取模（例如：`hash(key) mod R`）进行分区。这样能够生成非常均匀的数据分区。但是在某些情况下，通过向其他的一些分区函数传入`key`来进行分区会非常有用。比如，有时候输出的`key`为`URL`，我们希望每个主机的所有条目存放在同一个输出文件中。为了支持类似的情况，使用`MapReduce`库的用户可以提供一个特殊函数。例如，使用 **“hash(Hostname(key)) mod R”**作为分区函数，就可以把所有来自同一个主机的`URL`保存在同一个输出文件中。
+>
+> 顺序保证
+>
+> 在给定的分区中，我们保证中间键值对的处理顺序是根据`key`的大小进行升序排列。
+>
+> Combiner函数
+>
+> 我们允许用户提供一个可选的`Combiner`函数，在数据通过网络发送之前，可以通过该函数将数据进行部分合并。
+>
+> `Combiner`函数会在每台执行`Map`任务的机器上执行一次。通常情况下，`Combiner`函数和`Reduce`函数的实现代码是一样的。`Reduce`函数和`Combiner`函数唯一的区别在于`MapReduce`库处理函数输出上面会有所不同。`Reduce`函数的输出会被写入一个最终输出文件中，而`Combiner`函数的输出会被写入一个要发送给`reduce`任务的中间文件中。
+>
+> 输入输出数据
+>
+> 跳过损坏的记录
+>
+> 在处理大型数据集的时候。我们提供了一种可选的执行模式，当`MapReduce`库检测到某些记录绝对会引起崩溃的时候，它就会跳过这些记录，以此来保证计算进度的推进。
+>
+> 每个`worker`进程都会通过一个`handler`来捕获内存段异常（segmentation violation）和总线错误（bus error）。在调用用户的`Map`或`Reduce`操作前，`MapReduce`库会用一个全局变量来保存参数序号。如果用户代码产生了一个`signal`，`singnal handler`就会在发送最后一个`UDP`包时，在该`UDP`包中放入该序号并发送给`MapReduce master`的序号。当`master`检测到在某条记录上有多次故障的时候，当它发出相应的`Map`或者`Reduce`任务重新执行时，它就表示应该跳过这条记录。、
+>
+> 状态信息
+>
+> 在`master`中，有一个内置的`HTTP`服务器，它可以用来展示一组状态信息页面。状态页面会显示计算进度，例如：已经完成的任务数量、正在执行的任务数量、输入的字节数、中间数据的字节数、输出的字节数、处理率等等。
+>
+> 计数器
+>
+> `MapReduce`库提供了计数器机制，它能用来统计不同活动的发生次数。为了使用这种机制，用户需要创建一个名为`Counter`的对象，然后在`Map`和`Reduce`函数中以正确的方式增加`counter`的数字。
+>
+> ```c
+> Count* uppercase;
+> uppercase = GetCounter("uppercase");
+> 
+> map(String name, String contents) :
+> for each word w in contents:
+> if(isCapitalized(w)):
+> uppercase->Increment();
+> EmitIntermediate(w,"1");
+> ```
+>
+> 每隔一段时间，这些`counter`值会从每个`worker`机器传递给`master`（附加在`ping`的应答包中进行传递）。当`MapReduce`操作完成时，`master`会将这些已经成功完成的`map`和`reduce`任务中返回的`counter`的值聚合在一起，并将它们返回给用户代码。当前的`counter`值会显示在`master`的状态页面中。这样，人们就可以看到当前计算的进度。当聚合这些`counter`的值时，`master`会去掉那些重复执行的相同`map`或者`reduce`操作的次数，以此避免重复计数。
+
