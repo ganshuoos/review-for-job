@@ -145,4 +145,26 @@
 >
 > （1）defer队列先进后出 （2）设置返回值  defer 执行RET指令
 >
-> 
+
+**3.make 与 new**
+
+>```go
+>type Demo struct {
+>    b *demoB
+>}
+>
+>type demoB struct { 
+>	c *int
+>}
+>
+>func main() {
+>    a := new(Demo)
+>    fmt.Println(a.b) //可以被初始化， new可以初始化结构体
+>    fmt.Println(a.b.b) //不可以被初始化， 引用类型new不能初始化
+>}
+>
+>//for range 的坑！
+>
+>```
+>
+>
