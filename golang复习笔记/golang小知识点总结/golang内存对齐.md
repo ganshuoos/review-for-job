@@ -10,4 +10,6 @@
 >
 > ![](golang%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90.assets/%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90-1610028764590.PNG)
 >
-> 
+> **对齐方式举例**
+>
+> ![](golang%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90.assets/%E5%AF%B9%E9%BD%90%E6%96%B9%E5%BC%8F%E4%B8%BE%E4%BE%8B.PNG)
